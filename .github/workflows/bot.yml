@@ -1,0 +1,49 @@
+name: bot
+
+on:
+  schedule:
+    - cron: "7 */4 * * *"   # 4時間足の確定（UTC 0,4,8,...時）の7分後
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: 枠A 仮想売買
+        run: python -m bot.run
+
+      # 実弾は、リポジトリの変数 LIVE_TRADING を true にしたときだけ動く
+      - name: 枠A 実弾
+        if: vars.LIVE_TRADING == 'true'
+        env:
+          BITBANK_API_KEY: ${{ secrets.BITBANK_API_KEY }}
+          BITBANK_API_SECRET: ${{ secrets.BITBANK_API_SECRET }}
+        run: python -m bot.run --live
+
+      - name: 枠B シグナル
+        continue-on-error: true
+        run: python -m bot.etf_signal
+
+      - name: 記録をコミット
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add records
+          git diff --cached --quiet || git commit -m "記録を更新"
+          git push

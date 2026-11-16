@@ -1,0 +1,22 @@
+{
+ "halted": false,
+ "pairs": {
+  "btc_jpy": {
+   "cash": 5000.0,
+   "qty": 0.0,
+   "entry_cost": 0.0,
+   "last_bar": "2026-11-16T00:00:00+00:00"
+  },
+  "eth_jpy": {
+   "cash": 5000.0,
+   "qty": 0.0,
+   "entry_cost": 0.0,
+   "last_bar": "2026-11-16T00:00:00+00:00"
+  }
+ },
+ "hold": {
+  "pair": "btc_jpy",
+  "qty": 0.0009,
+  "cash": 733.9335904
+ }
+}

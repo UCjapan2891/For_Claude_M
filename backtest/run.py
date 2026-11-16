@@ -12,8 +12,9 @@ import pandas as pd
 from .data import bitbank_4h, yahoo_daily
 from .strategy import CRYPTO_4H, ETF_DAILY, Costs, buy_and_hold, max_drawdown, simulate
 
-# 費用の仮定（bitbank の手数料は公式ページで要確認）
-CRYPTO_COSTS = Costs(fee=0.0012, slippage=0.0005, lot=0.0001)
+# 手数料は bitbank の公開API（/v1/spot/pairs）で 2026/11/16 に確認したテイカー料率。ずれは仮定
+BTC_COSTS = Costs(fee=0.0010, slippage=0.0005, lot=0.0001)
+ETH_COSTS = Costs(fee=0.0012, slippage=0.0005, lot=0.0001)
 ETF_COSTS = Costs(fee=0.0, slippage=0.001, lot=1.0)      # 2869 は1口単位
 ETF10_COSTS = Costs(fee=0.0, slippage=0.001, lot=10.0)   # 1579 は10口単位
 
@@ -81,8 +82,8 @@ def main():
     refresh = "--refresh" in sys.argv
     years = list(range(2021, pd.Timestamp.now().year + 1))
     targets = [
-        ("A: BTC/JPY 4時間足", bitbank_4h("btc_jpy", years, refresh), CRYPTO_4H, 5000, CRYPTO_COSTS),
-        ("A: ETH/JPY 4時間足", bitbank_4h("eth_jpy", years, refresh), CRYPTO_4H, 5000, CRYPTO_COSTS),
+        ("A: BTC/JPY 4時間足", bitbank_4h("btc_jpy", years, refresh), CRYPTO_4H, 5000, BTC_COSTS),
+        ("A: ETH/JPY 4時間足", bitbank_4h("eth_jpy", years, refresh), CRYPTO_4H, 5000, ETH_COSTS),
         ("B: 2869 日足", yahoo_daily("2869.T", "5y", refresh), ETF_DAILY, 10000, ETF_COSTS),
         ("B予備: 1579 日足", yahoo_daily("1579.T", "5y", refresh), ETF_DAILY, 10000, ETF10_COSTS),
     ]
